@@ -1,7 +1,20 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
 }
+
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+val keystoreProperties = Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
 android {
     namespace = "com.thoughtworks.androidtrain"
@@ -17,6 +30,21 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        create("debug_config") {
+            keyAlias = keystoreProperties["debug_sign.keyAlias"] as String
+            keyPassword = keystoreProperties["debug_sign.keyPassword"] as String
+            storeFile = file(keystoreProperties["debug_sign.storeFile"] as String)
+            storePassword = keystoreProperties["debug_sign.storePassword"] as String
+        }
+        create("release_config") {
+            keyAlias = keystoreProperties["release_sign.keyAlias"] as String
+            keyPassword = keystoreProperties["release_sign.keyPassword"] as String
+            storeFile = file(keystoreProperties["release_sign.storeFile"] as String)
+            storePassword = keystoreProperties["release_sign.storePassword"] as String
         }
     }
 
